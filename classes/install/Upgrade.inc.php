@@ -1366,7 +1366,8 @@ class Upgrade extends Installer {
 			foreach ((array) $submissionFiles as $submissionFile) {
 				$submissionFile->setGenreId($genre->getId());
 				$submissionFile->setUploaderUserId($creatorUserId);
-				$submissionFile->setFileStage(SUBMISSION_FILE_PROOF);
+				$fileStage = $article->getStatus() == STATUS_PUBLISHED ? SUBMISSION_FILE_PROOF : SUBMISSION_FILE_SUBMISSION;
+				$submissionFile->setFileStage($fileStage);
 				$submissionFileDao->updateObject($submissionFile);
 			}
 
@@ -1455,6 +1456,47 @@ class Upgrade extends Installer {
 								'string'
 							)
 						);
+					}
+				}
+			}
+		}
+		$suppFilesResult->Close();
+		return true;
+	}
+
+	/**
+	 * Provide supplementary files of active submissions for review.
+	 * @return boolean True indicates success.
+	 */
+	function provideSupplementaryFilesForReview() {
+		$submissionFileDao = DAORegistry::getDAO('SubmissionFileDAO');
+		$reviewRoundDao = DAORegistry::getDAO('ReviewRoundDAO');
+		$reviewAssignmentDao = DAORegistry::getDAO('ReviewAssignmentDAO');
+		$reviewFilesDao = DAORegistry::getDAO('ReviewFilesDAO');
+		import('lib.pkp.classes.file.SubmissionFileManager');
+		// Get supp files with show_reviewers = 1
+		// We cannot support/consider remote supp files
+		$suppFilesResult = $submissionFileDao->retrieve('SELECT a.context_id, sf.* FROM article_supplementary_files sf, submissions a WHERE a.submission_id = sf.article_id AND sf.show_reviewers = 1 AND sf.remote_url IS NULL');
+		while (!$suppFilesResult->EOF) {
+			$suppFilesRow = $suppFilesResult->getRowAssoc(false);
+			$suppFilesResult->MoveNext();
+			$reviewRounds = $reviewRoundDao->getBySubmissionId($suppFilesRow['article_id'], WORKFLOW_STAGE_ID_EXTERNAL_REVIEW);
+			// If a review round exists
+			// copy the supp file to the submissin review stage, add it to each existing review round, and as a review round file
+			if ($reviewRounds->getCount() != 0) {
+				$submissionFileManager = new SubmissionFileManager($suppFilesRow['context_id'], $suppFilesRow['article_id']);
+				// Retrieve the supp file last revision number, although they probably only have revision 1.
+				$revisionNumber = $submissionFileDao->getLatestRevisionNumber($suppFilesRow['file_id']);
+				// copy the supp file to the submissin review stage
+				list($newFileId, $newRevision) = $submissionFileManager->copyFileToFileStage($suppFilesRow['file_id'], $revisionNumber, SUBMISSION_FILE_REVIEW_FILE, null, true);
+				while ($reviewRound = $reviewRounds->next()) {
+					// add it to the review round
+					$submissionFileDao->assignRevisionToReviewRound($newFileId, $newRevision, $reviewRound);
+					// Get all review assignments
+					$reviewAssignments = $reviewAssignmentDao->getBySubmissionId($suppFilesRow['article_id'], $reviewRound->getId(), WORKFLOW_STAGE_ID_EXTERNAL_REVIEW);
+					foreach ($reviewAssignments as $reviewAssignment) {
+						// add it to the review files
+						$reviewFilesDao->grant($reviewAssignment->getId(), $newFileId);
 					}
 				}
 			}
@@ -2527,34 +2569,34 @@ class Upgrade extends Installer {
 	function repairSuppFilesFilestage() {
 		$submissionFileDao = DAORegistry::getDAO('SubmissionFileDAO');
 
+		import('lib.pkp.classes.submission.SubmissionFile');
 		import('lib.pkp.classes.file.SubmissionFileManager');
 
 		// get reviewer file ids
 		$result = $submissionFileDao->retrieve(
 			'SELECT ssf.*, s.context_id
 			FROM submission_supplementary_files ssf, submission_files sf, submissions s
-			WHERE sf.file_id = ssf.file_id AND sf.revision = ssf.revision AND s.submission_id = sf.submission_id'
+			WHERE sf.file_id = ssf.file_id AND sf.file_stage = ? AND sf.assoc_type = ? AND sf.revision = ssf.revision AND s.submission_id = sf.submission_id',
+			array((int)SUBMISSION_FILE_SUBMISSION, (int)ASSOC_TYPE_REPRESENTATION)
 		);
 		while (!$result->EOF) {
 			$row = $result->GetRowAssoc(false);
 			$submissionFileRevision = $submissionFileDao->getRevision($row['file_id'], $row['revision']);
-			if ($submissionFileRevision->getFileStage() != SUBMISSION_FILE_PROOF) {
-				$submissionFileManager = new SubmissionFileManager($row['context_id'], $submissionFileRevision->getSubmissionId());
-				$basePath = $submissionFileManager->getBasePath() . '/';
-				$generatedOldFilename = $submissionFileRevision->getServerFileName();
-				$oldFileName = $basePath . $submissionFileRevision->_fileStageToPath($submissionFileRevision->getFileStage()) . '/' . $generatedOldFilename;
-				$submissionFileRevision->setFileStage(SUBMISSION_FILE_PROOF);
-				$generatedNewFilename = $submissionFileRevision->getServerFileName();
-				$newFileName = $basePath . $submissionFileRevision->_fileStageToPath($submissionFileRevision->getFileStage()) . '/' . $generatedNewFilename;
-				if (!file_exists($newFileName)) {
-					if (!file_exists($path = dirname($newFileName)) && !$submissionFileManager->mkdirtree($path)) {
-						error_log("Unable to make directory \"$path\"");
-					}
-					if (!rename($oldFileName, $newFileName)) {
-						error_log("Unable to move \"$oldFileName\" to \"$newFileName\".");
-					} else {
-						$submissionFileDao->updateObject($submissionFileRevision);
-					}
+			$submissionFileManager = new SubmissionFileManager($row['context_id'], $submissionFileRevision->getSubmissionId());
+			$basePath = $submissionFileManager->getBasePath() . '/';
+			$generatedOldFilename = $submissionFileRevision->getServerFileName();
+			$oldFileName = $basePath . $submissionFileRevision->_fileStageToPath($submissionFileRevision->getFileStage()) . '/' . $generatedOldFilename;
+			$submissionFileRevision->setFileStage(SUBMISSION_FILE_PROOF);
+			$generatedNewFilename = $submissionFileRevision->getServerFileName();
+			$newFileName = $basePath . $submissionFileRevision->_fileStageToPath($submissionFileRevision->getFileStage()) . '/' . $generatedNewFilename;
+			if (!file_exists($newFileName)) {
+				if (!file_exists($path = dirname($newFileName)) && !$submissionFileManager->mkdirtree($path)) {
+					error_log("Unable to make directory \"$path\"");
+				}
+				if (!rename($oldFileName, $newFileName)) {
+					error_log("Unable to move \"$oldFileName\" to \"$newFileName\".");
+				} else {
+					$submissionFileDao->updateObject($submissionFileRevision);
 				}
 			}
 			$result->MoveNext();
@@ -2675,7 +2717,7 @@ class Upgrade extends Installer {
 
 		// Consider issue cover images
 		// Note that the locale column values are already changed above
-		$settingValueResult = $journalSettingsDao->retrieve('SELECT a.*, b.journal_id FROM issue_settings a, issues b WHERE a.setting_name = \'coverImage\' AND a.locale = ? AND a.setting_value LIKE ? AND a.setting_type = \'string\' AND b.issue_id = a.issue_id', array($newLocale, '%' .$oldLocale .'%'));
+		$settingValueResult = $journalSettingsDao->retrieve('SELECT a.*, b.journal_id FROM issue_settings a, issues b WHERE a.setting_name = \'fileName\' AND a.locale = ? AND a.setting_value LIKE ? AND a.setting_type = \'string\' AND b.issue_id = a.issue_id', array($newLocale, '%' .$oldLocale .'%'));
 		while (!$settingValueResult->EOF) {
 			$row = $settingValueResult->getRowAssoc(false);
 			$oldCoverImage = $row['setting_value'];
@@ -2684,14 +2726,14 @@ class Upgrade extends Installer {
 				$publicFileManager->copyJournalFile($row['journal_id'], $publicFileManager->getContextFilesPath(ASSOC_TYPE_JOURNAL, $row['journal_id']) . '/' . $oldCoverImage, $newCoverImage);
 				$publicFileManager->removeJournalFile($row['journal_id'], $oldCoverImage);
 			}
-			$journalSettingsDao->update('UPDATE issue_settings SET setting_value = ? WHERE issue_id = ? AND setting_name = \'coverImage\' AND locale = ?', array($newCoverImage, (int) $row['issue_id'], $newLocale));
+			$journalSettingsDao->update('UPDATE issue_settings SET setting_value = ? WHERE issue_id = ? AND setting_name = \'fileName\' AND locale = ?', array($newCoverImage, (int) $row['issue_id'], $newLocale));
 			$settingValueResult->MoveNext();
 		}
 		$settingValueResult->Close();
 
 		// Consider article cover images
 		// Note that the locale column values are already changed above
-		$settingValueResult = $journalSettingsDao->retrieve('SELECT a.*, b.context_id FROM submission_settings a, submissions b WHERE a.setting_name = \'coverImage\' AND a.locale = ? AND a.setting_value LIKE ? AND a.setting_type = \'string\' AND b.submission_id = a.submission_id', array($newLocale, '%' .$oldLocale .'%'));
+		$settingValueResult = $journalSettingsDao->retrieve('SELECT a.*, b.context_id FROM submission_settings a, submissions b WHERE a.setting_name = \'fileName\' AND a.locale = ? AND a.setting_value LIKE ? AND a.setting_type = \'string\' AND b.submission_id = a.submission_id', array($newLocale, '%' .$oldLocale .'%'));
 		while (!$settingValueResult->EOF) {
 			$row = $settingValueResult->getRowAssoc(false);
 			$oldCoverImage = $row['setting_value'];
@@ -2700,7 +2742,7 @@ class Upgrade extends Installer {
 				$publicFileManager->copyJournalFile($row['context_id'], $publicFileManager->getContextFilesPath(ASSOC_TYPE_JOURNAL, $row['context_id']) . '/' . $oldCoverImage, $newCoverImage);
 				$publicFileManager->removeJournalFile($row['context_id'], $oldCoverImage);
 			}
-			$journalSettingsDao->update('UPDATE submission_settings SET setting_value = ? WHERE submission_id = ? AND setting_name = \'coverImage\' AND locale = ?', array($newCoverImage, (int) $row['submission_id'], $newLocale));
+			$journalSettingsDao->update('UPDATE submission_settings SET setting_value = ? WHERE submission_id = ? AND setting_name = \'fileName\' AND locale = ?', array($newCoverImage, (int) $row['submission_id'], $newLocale));
 			$settingValueResult->MoveNext();
 		}
 		$settingValueResult->Close();

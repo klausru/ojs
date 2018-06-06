@@ -197,6 +197,7 @@
 	<message key="user.registerForOtherJournals">Зарегистрировать для других журналов</message>
 	<message key="user.reviewerPrompt">Хотите ли вы рецензировать материалы для этого журнала?</message>
 	<message key="user.reviewerPrompt.userGroup">Да, запросить роль «{$userGroup}».</message>
+	<message key="user.reviewerPrompt.optin">Да, Я хочу, чтобы ко мне обращались с запросами на рецензирование материалов для этого журнала.</message>
 	<message key="user.register.contextsPrompt">В каких журналах на этом сайте вы хотите зарегистрироваться?</message>
 	<message key="user.register.otherContextRoles">Запросить следующие роли.</message>
 	<message key="user.register.noContextReviewerInterests">Если вы запрашиваете роль рецензента в каком-то журнале, пожалуйста, введите темы, которые интересуют Вас как рецензента.</message>
@@ -674,6 +675,7 @@
 	<message key="user.register.reviewerDescriptionNoInterests">Согласен участвовать в рецензировании материалов для этого журнала.</message>
 	<message key="user.register.reviewerDescription">Согласен участвовать в рецензировании материалов для этого сайта.</message>
 	<message key="user.register.reviewerInterests">Укажите Ваши интересы как рецензента (основная тематика, методы исследования):</message>
+	<message key="user.register.form.emailConsentAllContexts">Да, я хочу, чтобы меня уведомляли о новых публикациях и объявлениях во всех журналах, в которых я зарегистрирован.</message>
 
 	<!-- Подписки -->
 	<message key="user.subscriptions.mySubscriptions">Мои подписки</message>
@@ -1033,8 +1035,6 @@
 
 
 	<!-- Типы уведомлений -->
-	<message key="notification.mailListDescription">Введите ваш адрес электронной почты, чтобы моментально получать уведомления о добавлении нового контента в журнал.</message>
-	<message key="notification.notificationsPublicDescription">На этой странице показан список важных обновлений, связанных с этим журналом, таких как выход новых выпусков или объявления. Вы можете подписаться на эти уведомления через ленты RSS (щелкнув на значках справа) или <![CDATA[  <a href="{$emailUrl}">по электронной почте.</a>]]></message>
 
 	<message key="notification.type.articleSubmitted">Новая статья «{$title}» была отправлена.</message>
 	<message key="notification.type.editing">События редактирования</message>
@@ -1049,6 +1049,7 @@
 	<message key="notification.type.submissionComment">Редактор оставил комментарий к «{$title}».</message>
 	<message key="notification.type.submissions">События процесса отправки</message>
 	<message key="notification.type.userComment">Читатель добавил комментарий к «{$title}»</message>
+	<message key="notification.type.public">Публичные объявления</message>
 	<message key="notification.savedIssueMetadata">Сохранены метаданные публикации выпуска.</message>
 	<message key="notification.type.editorAssignmentTask">Была отправлена новая статья, которой нужно назначить редактора.</message>
 	<message key="notification.type.assignProductionUser">Назначить пользователя для создания гранок с помощью ссылки «Назначить» в списке «Участники».</message>
