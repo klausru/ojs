@@ -35,7 +35,6 @@ class DOIPubIdPlugin extends PubIdPlugin {
 			HookRegistry::register('Submission::getProperties::values', array($this, 'modifyObjectPropertyValues'));
 			HookRegistry::register('Issue::getProperties::values', array($this, 'modifyObjectPropertyValues'));
 			HookRegistry::register('Galley::getProperties::values', array($this, 'modifyObjectPropertyValues'));
-			$this->_registerTemplateResource();
 		}
 		return $success;
 	}
@@ -55,13 +54,6 @@ class DOIPubIdPlugin extends PubIdPlugin {
 	 */
 	function getDescription() {
 		return __('plugins.pubIds.doi.description');
-	}
-
-	/**
-	 * @copydoc Plugin::getTemplatePath()
-	 */
-	function getTemplatePath($inCore = false) {
-		return $this->getTemplateResourceName() . ':templates/';
 	}
 
 
@@ -107,14 +99,14 @@ class DOIPubIdPlugin extends PubIdPlugin {
 	 * @copydoc PKPPubIdPlugin::getPubIdMetadataFile()
 	 */
 	function getPubIdMetadataFile() {
-		return $this->getTemplatePath() . 'doiSuffixEdit.tpl';
+		return $this->getTemplateResource('doiSuffixEdit.tpl');
 	}
 
 	/**
 	 * @copydoc PKPPubIdPlugin::getPubIdAssignFile()
 	 */
 	function getPubIdAssignFile() {
-		return $this->getTemplatePath() . 'doiAssign.tpl';
+		return $this->getTemplateResource('doiAssign.tpl');
 	}
 
 	/**
@@ -159,8 +151,7 @@ class DOIPubIdPlugin extends PubIdPlugin {
 	function getLinkActions($pubObject) {
 		$linkActions = array();
 		import('lib.pkp.classes.linkAction.request.RemoteActionConfirmationModal');
-		$application = PKPApplication::getApplication();
-		$request = $application->getRequest();
+		$request = Application::getRequest();
 		$userVars = $request->getUserVars();
 		$userVars['pubIdPlugIn'] = get_class($this);
 		// Clear object pub id
@@ -332,4 +323,4 @@ class DOIPubIdPlugin extends PubIdPlugin {
 	}
 }
 
-?>
+

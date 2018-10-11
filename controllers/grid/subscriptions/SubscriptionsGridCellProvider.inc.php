@@ -52,9 +52,11 @@ class SubscriptionsGridCellProvider extends GridCellProvider {
 				return array('label' => $subscription->getDateStart());
 			case 'dateEnd':
 				return array('label' => $subscription->getDateEnd());
+			case 'referenceNumber':
+				return array('label' => $subscription->getReferenceNumber());
 		}
 		assert(false);
 	}
 }
 
-?>
+

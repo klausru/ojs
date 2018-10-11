@@ -10,7 +10,7 @@
   * Installation descriptor file.
   -->
 
-<install version="3.1.1.0">
+<install version="3.2.0.0">
 	<code function="checkPhpVersion" />
 
 	<code function="createDirectories"/>
@@ -34,7 +34,6 @@
 	<schema file="lib/pkp/xml/schema/tombstone.xml" />
 	<schema file="lib/pkp/xml/schema/rolesAndUserGroups.xml" />
 	<schema file="lib/pkp/xml/schema/metrics.xml" />
-	<schema file="lib/pkp/xml/schema/views.xml" />
 	<schema file="lib/pkp/xml/schema/libraryFiles.xml" />
 	<schema file="lib/pkp/xml/schema/navigationMenus.xml" />
 

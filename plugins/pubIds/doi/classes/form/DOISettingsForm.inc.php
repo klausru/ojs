@@ -56,7 +56,7 @@ class DOISettingsForm extends Form {
 		$this->_contextId = $contextId;
 		$this->_plugin = $plugin;
 
-		parent::__construct($plugin->getTemplatePath() . 'settingsForm.tpl');
+		parent::__construct($plugin->getTemplateResource('settingsForm.tpl'));
 
 		$form = $this;
 		$this->addCheck(new FormValidatorCustom($this, 'doiObjects', 'required', 'plugins.pubIds.doi.manager.settings.doiObjectsRequired', function($enableIssueDoi) use ($form) {
@@ -80,8 +80,7 @@ class DOISettingsForm extends Form {
 
 		// for DOI reset requests
 		import('lib.pkp.classes.linkAction.request.RemoteActionConfirmationModal');
-		$application = PKPApplication::getApplication();
-		$request = $application->getRequest();
+		$request = Application::getRequest();
 		$this->setData('clearPubIdsLinkAction', new LinkAction(
 			'reassignDOIs',
 			new RemoteActionConfirmationModal(
@@ -160,4 +159,4 @@ class DOISettingsForm extends Form {
 	}
 }
 
-?>
+

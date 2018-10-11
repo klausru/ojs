@@ -64,6 +64,9 @@ class SubmissionHandler extends APIHandler {
 		$routeName = null;
 		$slimRequest = $this->getSlimRequest();
 
+		import('lib.pkp.classes.security.authorization.ContextAccessPolicy');
+		$this->addPolicy(new ContextAccessPolicy($request, $roleAssignments));
+
 		if (!is_null($slimRequest) && ($route = $slimRequest->getAttribute('route'))) {
 			$routeName = $route->getName();
 		}
@@ -85,7 +88,7 @@ class SubmissionHandler extends APIHandler {
 	 * @return Response
 	 */
 	public function getSubmissionList($slimRequest, $response, $args) {
-		$request = $this->getRequest();
+		$request = Application::getRequest();
 		$currentUser = $request->getUser();
 		$dispatcher = $request->getDispatcher();
 		$context = $request->getContext();
@@ -136,7 +139,7 @@ class SubmissionHandler extends APIHandler {
 	public function getSubmission($slimRequest, $response, $args) {
 		AppLocale::requireComponents(LOCALE_COMPONENT_PKP_READER, LOCALE_COMPONENT_PKP_SUBMISSION);
 
-		$request = $this->getRequest();
+		$request = Application::getRequest();
 		$dispatcher = $request->getDispatcher();
 		$context = $request->getContext();
 
@@ -162,7 +165,7 @@ class SubmissionHandler extends APIHandler {
 	 * @return Response
 	 */
 	public function getGalleys($slimRequest, $response, $args) {
-		$request = $this->getRequest();
+		$request = Application::getRequest();
 		$context = $request->getContext();
 		$submission = $this->getAuthorizedContextObject(ASSOC_TYPE_SUBMISSION);
 
@@ -209,7 +212,7 @@ class SubmissionHandler extends APIHandler {
 	 * @return Response
 	 */
 	public function getParticipants($slimRequest, $response, $args) {
-		$request = $this->getRequest();
+		$request = Application::getRequest();
 		$context = $request->getContext();
 		$submission = $this->getAuthorizedContextObject(ASSOC_TYPE_SUBMISSION);
 		$stageId = isset($args['stageId']) ? $args['stageId'] : null;
@@ -249,7 +252,7 @@ class SubmissionHandler extends APIHandler {
 	 */
 	private function _buildListRequestParams($slimRequest) {
 
-		$request = $this->getRequest();
+		$request = Application::getRequest();
 		$currentUser = $request->getUser();
 		$context = $request->getContext();
 

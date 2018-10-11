@@ -32,14 +32,14 @@ class JournalSettingsTabHandler extends ManagerSettingsTabHandler {
 	// Overridden methods from Handler
 	//
 	/**
-	 * @copydoc PKPHandler::initialize()
+	 * @copydoc ManagerSettingsTabHandler::initialize()
 	 */
-	function initialize($request, $args = null) {
-		parent::initialize($request, $args);
+	function initialize($request) {
+		parent::initialize($request);
 
 		// Load grid-specific translations
 		AppLocale::requireComponents(LOCALE_COMPONENT_PKP_USER);
 	}
 }
 
-?>
+

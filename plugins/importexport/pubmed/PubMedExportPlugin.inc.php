@@ -51,13 +51,6 @@ class PubMedExportPlugin extends ImportExportPlugin {
 	}
 
 	/**
-	 * @copydoc Plugin::getTemplatePath($inCore)
-	 */
-	function getTemplatePath($inCore = false) {
-		return parent::getTemplatePath($inCore) . 'templates/';
-	}
-
-	/**
 	 * Display the plugin.
 	 * @param $args array
 	 * @param $request PKPRequest
@@ -76,7 +69,7 @@ class PubMedExportPlugin extends ImportExportPlugin {
 					'inputName' => 'selectedSubmissions[]',
 				));
 				$templateMgr->assign('exportSubmissionsListData', json_encode($exportSubmissionsListHandler->getConfig()));
-				$templateMgr->display($this->getTemplatePath() . 'index.tpl');
+				$templateMgr->display($this->getTemplateResource('index.tpl'));
 				break;
 			case 'exportSubmissions':
 				$exportXml = $this->exportSubmissions(
@@ -88,8 +81,8 @@ class PubMedExportPlugin extends ImportExportPlugin {
 				$fileManager = new FileManager();
 				$exportFileName = $this->getExportFileName($this->getExportPath(), 'articles', $journal, '.xml');
 				$fileManager->writeFile($exportFileName, $exportXml);
-				$fileManager->downloadFile($exportFileName);
-				$fileManager->deleteFile($exportFileName);
+				$fileManager->downloadByPath($exportFileName);
+				$fileManager->deleteByPath($exportFileName);
 				break;
 			case 'exportIssues':
 				$exportXml = $this->exportIssues(
@@ -101,8 +94,8 @@ class PubMedExportPlugin extends ImportExportPlugin {
 				$fileManager = new FileManager();
 				$exportFileName = $this->getExportFileName($this->getExportPath(), 'issues', $journal, '.xml');
 				$fileManager->writeFile($exportFileName, $exportXml);
-				$fileManager->downloadFile($exportFileName);
-				$fileManager->deleteFile($exportFileName);
+				$fileManager->downloadByPath($exportFileName);
+				$fileManager->deleteByPath($exportFileName);
 				break;
 			default:
 				$dispatcher = $request->getDispatcher();
@@ -257,4 +250,4 @@ class PubMedExportPlugin extends ImportExportPlugin {
 	}
 }
 
-?>
+

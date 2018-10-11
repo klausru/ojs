@@ -115,6 +115,12 @@ enable_minified = Off
 ; alert purposes only.
 enable_beacon = On
 
+; Set this to "On" if you would like to only have a single, site-wide Privacy
+; Statement, rather than a separate Privacy Statement for each journal. Setting
+; this to "Off" will allow you to enter a site-wide Privacy Statement as well
+; as separate Privacy Statements for each journal.
+sitewide_privacy_statement = Off
+
 
 ;;;;;;;;;;;;;;;;;;;;;
 ; Database Settings ;
@@ -191,11 +197,6 @@ connection_charset = Off
 ; Must be set to "Off" if not supported by the database server
 database_charset = Off
 
-; Enable character normalization to utf-8 (recommended)
-; If disabled, strings will be passed through in their native encoding
-; Note that client_charset and database collation must be set
-; to "utf-8" for this to work, as characters are stored in utf-8
-charset_normalization = Off
 
 ;;;;;;;;;;;;;;;;;
 ; File Settings ;

@@ -20,22 +20,18 @@ class AnnouncementFeedPlugin extends GenericPlugin {
 	 * @copydoc Plugin::register()
 	 */
 	public function register($category, $path, $mainContextId = null) {
-		if (parent::register($category, $path, $mainContextId)) {
-			if ($this->getEnabled($mainContextId)) {
-				HookRegistry::register('TemplateManager::display',array($this, 'callbackAddLinks'));
-				$this->import('AnnouncementFeedBlockPlugin');
-				$blockPlugin = new AnnouncementFeedBlockPlugin($this);
-				PluginRegistry::register('blocks', $blockPlugin, $this->getPluginPath());
+		if (!parent::register($category, $path, $mainContextId)) return false;
+		if ($this->getEnabled($mainContextId)) {
+			HookRegistry::register('TemplateManager::display',array($this, 'callbackAddLinks'));
+			$this->import('AnnouncementFeedBlockPlugin');
+			$blockPlugin = new AnnouncementFeedBlockPlugin($this);
+			PluginRegistry::register('blocks', $blockPlugin, $this->getPluginPath());
 
-				$this->import('AnnouncementFeedGatewayPlugin');
-				$gatewayPlugin = new AnnouncementFeedGatewayPlugin($this);
-				PluginRegistry::register('gateways', $gatewayPlugin, $this->getPluginPath());
-
-				$this->_registerTemplateResource();
-			}
-			return true;
+			$this->import('AnnouncementFeedGatewayPlugin');
+			$gatewayPlugin = new AnnouncementFeedGatewayPlugin($this);
+			PluginRegistry::register('gateways', $gatewayPlugin, $this->getPluginPath());
 		}
-		return false;
+		return true;
 	}
 
 	/**
@@ -55,23 +51,16 @@ class AnnouncementFeedPlugin extends GenericPlugin {
 	}
 
 	/**
-	 * @copydoc Plugin::getTemplatePath()
-	 */
-	public function getTemplatePath($inCore = false) {
-		return $this->getTemplateResourceName() . ':templates/';
-	}
-
-	/**
 	 * Add links to the feeds.
 	 * @param $hookName string
 	 * @param $args array
 	 * @return boolean Hook processing status
 	 */
 	public function callbackAddLinks($hookName, $args) {
-		$request = $this->getRequest();
+		$request = Application::getRequest();
 		if ($this->getEnabled() && is_a($request->getRouter(), 'PKPPageRouter')) {
 			$templateManager = $args[0];
-			$currentJournal = $templateManager->get_template_vars('currentJournal');
+			$currentJournal = $templateManager->getTemplateVars('currentJournal');
 			$announcementsEnabled = $currentJournal ? $currentJournal->getSetting('enableAnnouncements') : false;
 
 			if (!$announcementsEnabled) {
@@ -146,7 +135,7 @@ class AnnouncementFeedPlugin extends GenericPlugin {
 
 				AppLocale::requireComponents(LOCALE_COMPONENT_APP_COMMON,  LOCALE_COMPONENT_PKP_MANAGER);
 				$templateMgr = TemplateManager::getManager($request);
-				$templateMgr->register_function('plugin_url', array($this, 'smartyPluginUrl'));
+				$templateMgr->registerPlugin('function', 'plugin_url', array($this, 'smartyPluginUrl'));
 
 				$this->import('AnnouncementFeedSettingsForm');
 				$form = new AnnouncementFeedSettingsForm($this, $context->getId());

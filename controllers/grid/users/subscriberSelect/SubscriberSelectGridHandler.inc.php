@@ -35,6 +35,15 @@ class SubscriberSelectGridHandler extends GridHandler {
 	// Implement template methods from PKPHandler
 	//
 	/**
+	 * @copydoc PKPHandler::authorize()
+	 */
+	function authorize($request, &$args, $roleAssignments) {
+		import('lib.pkp.classes.security.authorization.ContextAccessPolicy');
+		$this->addPolicy(new ContextAccessPolicy($request, $roleAssignments));
+		return parent::authorize($request, $args, $roleAssignments);
+	}
+
+	/**
 	 * @copydoc GridHandler::initialize()
 	 */
 	function initialize($request, $args = null) {
@@ -118,7 +127,7 @@ class SubscriberSelectGridHandler extends GridHandler {
 	/**
 	 * @copydoc GridHandler::renderFilter()
 	 */
-	function renderFilter($request) {
+	function renderFilter($request, $filterData = array()) {
 		$context = $request->getContext();
 		$userGroupDao = DAORegistry::getDAO('UserGroupDAO');
 		$userGroups = $userGroupDao->getByContextId($context->getId());
@@ -196,4 +205,4 @@ class SubscriberSelectGridHandler extends GridHandler {
 	}
 }
 
-?>
+

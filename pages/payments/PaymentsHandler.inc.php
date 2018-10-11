@@ -160,7 +160,7 @@ class PaymentsHandler extends Handler {
 		if ($paymentTypesForm->isLocaleResubmit()) {
 			$paymentTypesForm->readInputData();
 		} else {
-			$paymentTypesForm->initData($request->getContext());
+			$paymentTypesForm->initData();
 		}
 		return new JSONMessage(true, $paymentTypesForm->fetch($request));
 	}
@@ -178,7 +178,7 @@ class PaymentsHandler extends Handler {
 		$paymentTypesForm = new PaymentTypesForm();
 		$paymentTypesForm->readInputData();
 		if ($paymentTypesForm->validate()) {
-			$paymentTypesForm->execute($request);
+			$paymentTypesForm->execute();
 			$notificationManager = new NotificationManager();
 			$user = $request->getUser();
 			$notificationManager->createTrivialNotification($user->getId());

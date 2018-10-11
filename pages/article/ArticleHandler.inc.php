@@ -45,8 +45,9 @@ class ArticleHandler extends Handler {
 
 	/**
 	 * @see PKPHandler::initialize()
+	 * @param $args array Arguments list
 	 */
-	function initialize($request, $args) {
+	function initialize($request, $args = array()) {
 		$articleId = isset($args[0]) ? $args[0] : 0;
 
 		$journal = $request->getContext();
@@ -257,6 +258,7 @@ class ArticleHandler extends Handler {
 		$galleyId = isset($args[1]) ? $args[1] : 0;
 		$fileId = isset($args[2]) ? (int) $args[2] : 0;
 
+		if (!isset($this->galley)) $request->getDispatcher()->handle404();
 		if ($this->galley->getRemoteURL()) $request->redirectUrl($this->galley->getRemoteURL());
 		else if ($this->userCanViewGalley($request, $articleId, $galleyId)) {
 			if (!$fileId) {
@@ -275,7 +277,7 @@ class ArticleHandler extends Handler {
 			if (!HookRegistry::call('ArticleHandler::download', array($this->article, &$this->galley, &$fileId))) {
 				import('lib.pkp.classes.file.SubmissionFileManager');
 				$submissionFileManager = new SubmissionFileManager($this->article->getContextId(), $this->article->getId());
-				$submissionFileManager->downloadFile($fileId, null, $request->getUserVar('inline')?true:false);
+				$submissionFileManager->downloadById($fileId, null, $request->getUserVar('inline')?true:false);
 			}
 		} else {
 			header('HTTP/1.0 403 Forbidden');
@@ -394,4 +396,4 @@ class ArticleHandler extends Handler {
 	}
 }
 
-?>
+

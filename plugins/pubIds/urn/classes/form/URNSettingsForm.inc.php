@@ -55,7 +55,7 @@ class URNSettingsForm extends Form {
 		$this->_contextId = $contextId;
 		$this->_plugin = $plugin;
 
-		parent::__construct($plugin->getTemplatePath() . 'settingsForm.tpl');
+		parent::__construct($plugin->getTemplateResource('settingsForm.tpl'));
 
 		$form = $this;
 		$this->addCheck(new FormValidatorCustom($this, 'urnObjects', 'required', 'plugins.pubIds.urn.manager.settings.urnObjectsRequired', function($enableIssueURN) use ($form) {
@@ -80,8 +80,7 @@ class URNSettingsForm extends Form {
 
 		// for URN reset requests
 		import('lib.pkp.classes.linkAction.request.RemoteActionConfirmationModal');
-		$application = PKPApplication::getApplication();
-		$request = $application->getRequest();
+		$request = Application::getRequest();
 		$this->setData('clearPubIdsLinkAction', new LinkAction(
 			'reassignURNs',
 			new RemoteActionConfirmationModal(
@@ -137,7 +136,7 @@ class URNSettingsForm extends Form {
 	}
 
 	/**
-	 * @copydoc Form::validate()
+	 * @copydoc Form::execute()
 	 */
 	function execute() {
 		$contextId = $this->_getContextId();
@@ -167,4 +166,4 @@ class URNSettingsForm extends Form {
 	}
 }
 
-?>
+

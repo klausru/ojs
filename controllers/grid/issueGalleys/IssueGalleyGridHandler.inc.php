@@ -232,7 +232,7 @@ class IssueGalleyGridHandler extends GridHandler {
 		$issueGalley = $this->getAuthorizedContextObject(ASSOC_TYPE_ISSUE_GALLEY);
 		import('classes.file.IssueFileManager');
 		$issueFileManager = new IssueFileManager($issue->getId());
-		return $issueFileManager->downloadFile($issueGalley->getFileId());
+		return $issueFileManager->downloadById($issueGalley->getFileId());
 	}
 
 	/**
@@ -249,8 +249,8 @@ class IssueGalleyGridHandler extends GridHandler {
 		$issueGalleyForm = new IssueGalleyForm($request, $issue, $issueGalley);
 		$issueGalleyForm->readInputData();
 
-		if ($issueGalleyForm->validate($request)) {
-			$issueId = $issueGalleyForm->execute($request);
+		if ($issueGalleyForm->validate()) {
+			$issueId = $issueGalleyForm->execute();
 			return DAO::getDataChangedEvent($issueId);
 		}
 		return new JSONMessage(false);
@@ -281,4 +281,4 @@ class IssueGalleyGridHandler extends GridHandler {
 	}
 }
 
-?>
+

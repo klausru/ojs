@@ -22,8 +22,8 @@ class PageRouter extends PKPPageRouter {
 	 * @return array
 	 */
 	function getCacheablePages() {
-		return array('about', 'announcement', 'help', 'index', 'information', 'rt', 'issue', '');
+		return array('about', 'announcement', 'help', 'index', 'information', 'issue', '');
 	}
 }
 
-?>
+

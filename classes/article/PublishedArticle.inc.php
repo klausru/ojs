@@ -75,7 +75,7 @@ class PublishedArticle extends Article {
 	 * @return int
 	 */
 	function getViews() {
-		$application = PKPApplication::getApplication();
+		$application = Application::getApplication();
 		return $application->getPrimaryMetricByAssoc(ASSOC_TYPE_ARTICLE, $this->getId());
 	}
 
@@ -134,4 +134,4 @@ class PublishedArticle extends Article {
 	}
 }
 
-?>
+

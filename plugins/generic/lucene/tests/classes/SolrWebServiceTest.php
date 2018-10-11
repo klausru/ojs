@@ -58,7 +58,7 @@ class SolrWebServiceTest extends PKPTestCase {
 		parent::setUp();
 
 		// We need a router for URL generation.
-		$application = PKPApplication::getApplication();
+		$application = Application::getApplication();
 		$_SERVER['REQUEST_METHOD'] = 'GET';
 		$request = $application->getRequest();
 		if (!is_a($request->getRouter(), 'PKPRouter')) {
@@ -675,4 +675,4 @@ class SolrWebServiceTest extends PKPTestCase {
 		$returner[] = 'indexingState';
 	}
 }
-?>
+

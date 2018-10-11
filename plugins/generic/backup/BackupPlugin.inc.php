@@ -48,7 +48,7 @@ class BackupPlugin extends GenericPlugin {
 		$params =& $args[0];
 		$smarty =& $args[1];
 		$output =& $args[2];
-		$request = $this->getRequest();
+		$request = Application::getRequest();
 		$output .= '<li><a href="' . $request->url(null, 'backup') . '">' . __('plugins.generic.backup.link') . '</a></li>';
 		return false;
 	}
@@ -63,7 +63,7 @@ class BackupPlugin extends GenericPlugin {
 		$page =& $args[0];
 		$op =& $args[1];
 		$sourceFile =& $args[2];
-		$request = $this->getRequest();
+		$request = Application::getRequest();
 
 		if ($page !== 'backup') return false;
 		// We've already verified that this is a site admin through
@@ -76,7 +76,7 @@ class BackupPlugin extends GenericPlugin {
 				$templateMgr = TemplateManager::getManager($request);
 				$templateMgr->assign('isDumpConfigured', Config::getVar('cli', 'dump')!='');
 				$templateMgr->assign('isTarConfigured', Config::getVar('cli', 'tar')!='');
-				$templateMgr->display($this->getTemplatePath() . 'index.tpl');
+				$templateMgr->display($this->getTemplateResource('index.tpl'));
 				exit();
 			case 'db':
 				$dumpTool = Config::getVar('cli', 'dump');
@@ -148,4 +148,4 @@ class BackupPlugin extends GenericPlugin {
 	}
 }
 
-?>
+

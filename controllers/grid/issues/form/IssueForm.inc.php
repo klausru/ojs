@@ -97,8 +97,9 @@ class IssueForm extends Form {
 	/**
 	 * @copydoc Form::validate()
 	 */
-	function validate($request) {
+	function validate($callHooks = true) {
 		if ($temporaryFileId = $this->getData('temporaryFileId')) {
+			$request = Application::getRequest();
 			$user = $request->getUser();
 			$temporaryFileDao = DAORegistry::getDAO('TemporaryFileDAO');
 			$temporaryFile = $temporaryFileDao->getTemporaryFile($temporaryFileId, $user->getId());
@@ -110,13 +111,13 @@ class IssueForm extends Form {
 			}
 		}
 
-		return parent::validate();
+		return parent::validate($callHooks);
 	}
 
 	/**
 	 * @copydoc Form::initData()
 	 */
-	function initData($request) {
+	function initData() {
 		if (isset($this->issue)) {
 			$locale = AppLocale::getLocale();
 			$this->_data = array(
@@ -171,9 +172,9 @@ class IssueForm extends Form {
 
 	/**
 	 * Save issue settings.
-	 * @param $request PKPRequest
 	 */
-	function execute($request) {
+	function execute() {
+		$request = Application::getRequest();
 		$journal = $request->getJournal();
 
 		$issueDao = DAORegistry::getDAO('IssueDAO');
@@ -244,4 +245,4 @@ class IssueForm extends Form {
 	}
 }
 
-?>
+

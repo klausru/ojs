@@ -20,15 +20,12 @@ class HtmlArticleGalleyPlugin extends GenericPlugin {
 	 * @see Plugin::register()
 	 */
 	function register($category, $path, $mainContextId = null) {
-		if (parent::register($category, $path, $mainContextId)) {
-			if ($this->getEnabled($mainContextId)) {
-				HookRegistry::register('ArticleHandler::view::galley', array($this, 'articleViewCallback'), HOOK_SEQUENCE_LATE);
-				HookRegistry::register('ArticleHandler::download', array($this, 'articleDownloadCallback'), HOOK_SEQUENCE_LATE);
-				$this->_registerTemplateResource();
-			}
-			return true;
+		if (!parent::register($category, $path, $mainContextId)) return false;
+		if ($this->getEnabled($mainContextId)) {
+			HookRegistry::register('ArticleHandler::view::galley', array($this, 'articleViewCallback'), HOOK_SEQUENCE_LATE);
+			HookRegistry::register('ArticleHandler::download', array($this, 'articleDownloadCallback'), HOOK_SEQUENCE_LATE);
 		}
-		return false;
+		return true;
 	}
 
 	/**
@@ -55,13 +52,6 @@ class HtmlArticleGalleyPlugin extends GenericPlugin {
 	}
 
 	/**
-	 * @copydoc Plugin::getTemplatePath()
-	 */
-	function getTemplatePath($inCore = false) {
-		return $this->getTemplateResourceName() . ':';
-	}
-
-	/**
 	 * Present the article wrapper page.
 	 * @param string $hookName
 	 * @param array $args
@@ -79,7 +69,7 @@ class HtmlArticleGalleyPlugin extends GenericPlugin {
 				'article' => $article,
 				'galley' => $galley,
 			));
-			$templateMgr->display($this->getTemplatePath() . 'display.tpl');
+			$templateMgr->display($this->getTemplateResource('display.tpl'));
 
 			return true;
 		}
@@ -142,7 +132,7 @@ class HtmlArticleGalleyPlugin extends GenericPlugin {
 				$referredArticle = $articleDao->getById($galley->getSubmissionId());
 			}
 			$fileUrl = $request->url(null, 'article', 'download', array($referredArticle->getBestArticleId(), $galley->getBestGalleyId(), $embeddableFile->getFileId()), $params);
-			$pattern = preg_quote($embeddableFile->getOriginalFileName());
+			$pattern = preg_quote(rawurlencode($embeddableFile->getOriginalFileName()));
 
 			$contents = preg_replace(
 				'/([Ss][Rr][Cc]|[Hh][Rr][Ee][Ff]|[Dd][Aa][Tt][Aa])\s*=\s*"([^"]*' . $pattern . ')"/',
@@ -267,4 +257,4 @@ class HtmlArticleGalleyPlugin extends GenericPlugin {
 	}
 }
 
-?>
+

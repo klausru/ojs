@@ -144,7 +144,7 @@ class DataciteInfoSender extends ScheduledTask {
 				$this->_addLogEntry($result);
 			}
 			// Remove all temporary files.
-			$fileManager->deleteFile($exportFileName);
+			$fileManager->deleteByPath($exportFileName);
 		}
 	}
 
@@ -170,4 +170,4 @@ class DataciteInfoSender extends ScheduledTask {
 	}
 
 }
-?>
+

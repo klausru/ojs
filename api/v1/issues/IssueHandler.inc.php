@@ -61,6 +61,9 @@ class IssueHandler extends APIHandler {
 		import('lib.pkp.classes.security.authorization.ContextRequiredPolicy');
 		$this->addPolicy(new ContextRequiredPolicy($request));
 
+		import('lib.pkp.classes.security.authorization.ContextAccessPolicy');
+		$this->addPolicy(new ContextAccessPolicy($request, $roleAssignments));
+
 		import('classes.security.authorization.OjsJournalMustPublishPolicy');
 		$this->addPolicy(new OjsJournalMustPublishPolicy($request));
 
@@ -106,7 +109,7 @@ class IssueHandler extends APIHandler {
 			switch ($param) {
 
 				case 'orderBy':
-					if (in_array($val, array('datePublished', 'lastModified'))) {
+					if (in_array($val, array('datePublished', 'lastModified', 'seq'))) {
 						$params[$param] = $val;
 					}
 					break;

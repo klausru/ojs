@@ -87,13 +87,6 @@ abstract class PubObjectsExportPlugin extends ImportExportPlugin {
 	}
 
 	/**
-	 * @copydoc Plugin::getTemplatePath($inCore)
-	 */
-	function getTemplatePath($inCore = false) {
-		return parent::getTemplatePath($inCore) . 'templates/';
-	}
-
-	/**
 	 * @copydoc ImportExportPlugin::display()
 	 */
 	function display($args, $request) {
@@ -182,8 +175,8 @@ abstract class PubObjectsExportPlugin extends ImportExportPlugin {
 			$fileManager = new FileManager();
 			$exportFileName = $this->getExportFileName($this->getExportPath(), $objectsFileNamePart, $context, '.xml');
 			$fileManager->writeFile($exportFileName, $exportXml);
-			$fileManager->downloadFile($exportFileName);
-			$fileManager->deleteFile($exportFileName);
+			$fileManager->downloadByPath($exportFileName);
+			$fileManager->deleteByPath($exportFileName);
 		} elseif ($request->getUserVar(EXPORT_ACTION_DEPOSIT)) {
 			assert($filter != null);
 			// Get the XML
@@ -217,7 +210,7 @@ abstract class PubObjectsExportPlugin extends ImportExportPlugin {
 				}
 			}
 			// Remove all temporary files.
-			$fileManager->deleteFile($exportFileName);
+			$fileManager->deleteByPath($exportFileName);
 			// redirect back to the right tab
 			$request->redirect(null, null, null, $path, null, $tab);
 		} elseif ($request->getUserVar(EXPORT_ACTION_MARKREGISTERED)) {
@@ -578,7 +571,7 @@ abstract class PubObjectsExportPlugin extends ImportExportPlugin {
 				}
 				$this->usage($scriptName);
 			}
-			$fileManager->deleteFile($exportFileName);
+			$fileManager->deleteByPath($exportFileName);
 		}
 	}
 
@@ -681,4 +674,4 @@ abstract class PubObjectsExportPlugin extends ImportExportPlugin {
 
 }
 
-?>
+

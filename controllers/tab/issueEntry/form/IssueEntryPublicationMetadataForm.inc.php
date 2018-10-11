@@ -212,9 +212,10 @@ class IssueEntryPublicationMetadataForm extends Form {
 	 * Save the metadata and store the catalog data for this published
 	 * monograph.
 	 */
-	function execute($request) {
-		parent::execute($request);
+	function execute() {
+		parent::execute();
 
+		$request = Application::getRequest();
 		$submission = $this->getSubmission();
 		$context = $request->getContext();
 
@@ -283,8 +284,8 @@ class IssueEntryPublicationMetadataForm extends Form {
 
 				// Schedule against an issue.
 				if ($publishedArticle) {
+					if ($issueId != $publishedArticle->getIssueId()) $publishedArticle->setSequence(REALLY_BIG_NUMBER);
 					$publishedArticle->setIssueId($issueId);
-					$publishedArticle->setSequence(REALLY_BIG_NUMBER);
 					$publishedArticle->setDatePublished($this->getData('datePublished'));
 					$publishedArticle->setAccessStatus($accessStatus);
 					$publishedArticleDao->updatePublishedArticle($publishedArticle);
@@ -358,4 +359,4 @@ class IssueEntryPublicationMetadataForm extends Form {
 	}
 }
 
-?>
+

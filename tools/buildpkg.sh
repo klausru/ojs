@@ -63,7 +63,7 @@ lib/pkp/tests										\
 lib/pkp/.git										\
 lib/pkp/lib/components/*.js								\
 lib/pkp/lib/components/*.css								\
-lib/pkp/js/lib/pnotify/build-tools							\
+lib/pkp/lib/vendor/smarty/smarty/demo							\
 lib/pkp/lib/vendor/alex198710/pnotify/.git						\
 lib/pkp/lib/vendor/sebastian								\
 lib/pkp/lib/vendor/oyejorge/less.php/test						\
@@ -126,21 +126,15 @@ echo "Done"
 
 echo "Installing composer dependencies:"
 echo -n " - lib/pkp ... "
-cd lib/pkp
-composer.phar update --no-dev
-cd ../..
+composer.phar -d=lib/pkp install --no-dev
 echo "Done"
 
 echo -n " - plugins/paymethod/paypal ... "
-cd plugins/paymethod/paypal
-composer.phar install --no-dev
-cd ../../..
+composer.phar -d=plugins/paymethod/paypal install --no-dev
 echo "Done"
 
 echo -n " - plugins/generic/citationStyleLanguage ... "
-cd plugins/generic/citationStyleLanguage
-composer.phar install --no-dev
-cd ../../..
+composer.phar -d=plugins/generic/citationStyleLanguage install --no-dev
 echo "Done"
 
 echo -n "Installing node dependencies... "

@@ -54,12 +54,12 @@ class MedraSettingsForm extends Form {
 		$this->_contextId = $contextId;
 		$this->_plugin = $plugin;
 
-		parent::__construct($plugin->getTemplatePath() . 'settingsForm.tpl');
+		parent::__construct($plugin->getTemplateResource('settingsForm.tpl'));
 
 		// DOI plugin settings action link
 		$pubIdPlugins = PluginRegistry::loadCategory('pubIds', true);
 		if (isset($pubIdPlugins['doipubidplugin'])) {
-			$application = PKPApplication::getApplication();
+			$application = Application::getApplication();
 			$request = $application->getRequest();
 			$dispatcher = $application->getDispatcher();
 			import('lib.pkp.classes.linkAction.request.AjaxModal');
@@ -185,4 +185,4 @@ class MedraSettingsForm extends Form {
 	}
 }
 
-?>
+

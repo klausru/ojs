@@ -44,8 +44,7 @@ class IssueEntryHandler extends PublicationEntryHandler {
 
 		$templateMgr->assign('galleys', $articleGalleys->toArray());
 
-		$application = Application::getApplication();
-		$request = $application->getRequest();
+		$request = Application::getRequest();
 		$router = $request->getRouter();
 		$dispatcher = $router->getDispatcher();
 
@@ -79,4 +78,4 @@ class IssueEntryHandler extends PublicationEntryHandler {
 	}
 }
 
-?>
+

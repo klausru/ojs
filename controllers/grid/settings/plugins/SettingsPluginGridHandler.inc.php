@@ -30,9 +30,9 @@ class SettingsPluginGridHandler extends PluginGridHandler {
 	// Extended methods from PluginGridHandler
 	//
 	/**
-	 * @copydoc PluginGridHandler::loadData()
+	 * @copydoc PluginGridHandler::loadCategoryData()
 	 */
-	function loadCategoryData($request, $categoryDataElement, $filter) {
+	function loadCategoryData($request, &$categoryDataElement, $filter = null) {
 		$plugins = parent::loadCategoryData($request, $categoryDataElement, $filter);
 		$userRoles = $this->getAuthorizedContextObject(ASSOC_TYPE_USER_ROLES);
 
@@ -85,9 +85,12 @@ class SettingsPluginGridHandler extends PluginGridHandler {
 					break;
 			}
 			$this->addPolicy(new PluginAccessPolicy($request, $args, $roleAssignments, $accessMode));
+		} else {
+			import('lib.pkp.classes.security.authorization.ContextAccessPolicy');
+			$this->addPolicy(new ContextAccessPolicy($request, $roleAssignments));
 		}
 		return parent::authorize($request, $args, $roleAssignments);
 	}
 }
 
-?>
+
